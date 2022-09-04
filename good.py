@@ -28,9 +28,26 @@ class Good:
 
 		ol.Get_HTML(pc_good_link)
 		soup = BS(ol.page_source, features='html5lib')
+
+
+		self.article = sx(ol.page_source, "'isbn':'","'")
+
 		self.name = soup.find('h1').text.strip()
+
+		fg = soup.find('div',{'class':'block product-card-description'}).find_all('div', {'class':'form-group'})
+		try:
+			for f in fg:
+				self.description = self.description + ' ' +reduce(f.text.replace(chr(10),' ').replace(chr(9),' ').strip())
+		except: pass
 		
-		self.article = soup.find('div',{'class':'product_meta'}).find('span',{'class':'sku_wrapper'}).find('span',{'class':'sku'}).text.strip()
+		for picture in soup.find_all('img',{'class':'fancybox'}):
+			append_if_not_exists(ol.site_url + picture['href'], self.pictures)
+		
+		self.price = soup.find('div',{'class':'price-new'}).text.replace('рублей','').replace(' ','')
+
+		self.description += ' ' + reduce(soup.find('div',{'class':'tab-pane fade show active'}).text.replace(chr(10),' ').replace(chr(9),' '))
+
+		return
 		
 		for i in range(ol.page_source.count('data-large_image="')):
 			append_if_not_exists(sx(ol.page_source,'data-large_image="','"',i+1), self.pictures)

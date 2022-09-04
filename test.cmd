@@ -1,4 +1,4 @@
-python unload.py good "https://ооо-ольга.рф/store/куртка-демисезонная-для-мальчика-2/" ".\csvs\test.csv" "1"
+python unload.py good "https://www.clever-media.ru/books/romany-anny-dzheyn-tvoe-serdtse-budet-razbito/" ".\csvs\test.csv" "1"
 
 
 

@@ -121,12 +121,12 @@ class Price:
 		else:
 			self.good = []
 			self.goods = []
-			self.goods.append(['ID товара', 'наименование', 'описание', 'цена', 'орг %', 'ccылка на товар на сайте поставщика', 'ссылки на Фото', 'Размер','Цвет'])
+			self.goods.append(['ID товара', 'наименование', 'описание', 'цена', 'орг %', 'ccылка на товар на сайте поставщика', 'ссылки на Фото'])
 
 
 
-	def add_good(self, id, name, descr, price, procent, link_on_site, link_on_pictures, size, color):
-		self.goods.append([id, name, descr, price, procent, link_on_site, link_on_pictures, size, color])
+	def add_good(self, id, name, descr, price, procent, link_on_site, link_on_pictures):
+		self.goods.append([id, name, descr, price, procent, link_on_site, link_on_pictures])
 
 	def write_to_csv(self, file_name):
 		if os.path.isfile(file_name):
