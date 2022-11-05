@@ -27,25 +27,41 @@ class Good:
 		echo(style('Товар: ', fg='bright_yellow') + style(pc_good_link, fg='bright_white') + style('  Прайс:', fg='bright_cyan') + style(pc_price, fg='bright_green'))
 
 		ol.Get_HTML(pc_good_link)
+		ol.Write_To_File('gsource.html')
 		soup = BS(ol.page_source, features='html5lib')
 
 
 		self.article = sx(ol.page_source, "'isbn':'","'")
 
 		self.name = soup.find('h1').text.strip()
-
-		fg = soup.find('div',{'class':'block product-card-description'}).find_all('div', {'class':'form-group'})
 		try:
-			for f in fg:
-				self.description = self.description + ' ' +reduce(f.text.replace(chr(10),' ').replace(chr(9),' ').strip())
-		except: pass
+			fg = soup.find('div',{'class':'block product-card-description'}).find_all('div', {'class':'form-group'})
+			try:
+				for f in fg:
+					self.description = self.description + ' ' +reduce(f.text.replace(chr(10),' ').replace(chr(9),' ').strip())
+			except: pass
+		except:
+			self.description = soup.find('div',{'class':'about__description'}).text
+			self.description = reduce(self.description.replace(chr(10),' ').replace(chr(9),' ').strip())
 		
 		for picture in soup.find_all('img',{'class':'fancybox'}):
 			append_if_not_exists(ol.site_url + picture['href'], self.pictures)
 		
-		self.price = soup.find('div',{'class':'price-new'}).text.replace('рублей','').replace(' ','')
+		if len(self.pictures)==0:
+			for picture in soup.find_all('img',{'alt':'Слайд4'}):
+				append_if_not_exists(ol.site_url + picture['src'], self.pictures)
 
-		self.description += ' ' + reduce(soup.find('div',{'class':'tab-pane fade show active'}).text.replace(chr(10),' ').replace(chr(9),' '))
+
+		try:
+			self.price = soup.find('div',{'class':'price-new'}).text.replace('рублей','').replace(' ','')
+		except:
+			self.price = soup.find('div',{'class':'item__actual-price'}).text.replace('рублей','').replace(' ','')
+		self.price = self.price.replace('руб.','')
+
+
+		try:
+			self.description += ' ' + reduce(soup.find('div',{'class':'tab-pane fade show active'}).text.replace(chr(10),' ').replace(chr(9),' '))
+		except: pass
 
 		return
 		
