@@ -26,12 +26,12 @@ class Good:
 		self.brand = ''
 		echo(style('Товар: ', fg='bright_yellow') + style(pc_good_link, fg='bright_white') + style('  Прайс:', fg='bright_cyan') + style(pc_price, fg='bright_green'))
 
-		ol.Get_HTML(pc_good_link)
+		self.page_source = ol.Get_HTML(pc_good_link)
 		ol.Write_To_File('gsource.html')
 		soup = BS(ol.page_source, features='html5lib')
 
 
-		self.article = sx(ol.page_source, "'isbn':'","'")
+		self.article = sx(ol.page_source, '"sku":"','"')
 
 		self.name = soup.find('h1').text.strip()
 		try:

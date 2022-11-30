@@ -34,6 +34,10 @@ if sys.argv[1] == 'good':
     for link in [sys.argv[2]]:
         lo_good = unload_one_good(wd, link, sys.argv[3])
         lc_name = lo_good.name if lo_good.name.count(lo_good.article) != 0 else lo_good.article + ' ' + lo_good.name
+        if 'Под заказ' in lo_good.description or 'Под заказ' in lo_good.page_source:
+            echo(style('Под заказ', fg='bright_red'))
+            continue
+        else: print('Не под заказ')
         price.add_good('',
                                 prepare_str(lc_name),
                                 prepare_str(lo_good.description),
@@ -53,9 +57,10 @@ if sys.argv[1] == 'catalog':
     for link in links_list:
         lo_good = unload_one_good(wd, link, sys.argv[3])
         lc_name = lo_good.name if lo_good.name.count(lo_good.article) != 0 else lo_good.article + ' ' + lo_good.name
-        if 'Под заказ' in lo_good.description:
+        if 'Под заказ' in lo_good.description or 'Под заказ' in lo_good.page_source:
             echo(style('Под заказ', fg='bright_red'))
             continue
+        else: print('Не под заказ')
         price.add_good('',
                                 prepare_str(lc_name),
                                 prepare_str(lo_good.description),

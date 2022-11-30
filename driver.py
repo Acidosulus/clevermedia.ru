@@ -57,8 +57,7 @@ class WD:
 			#r = requests.get(curl)
 			self.page_source = r.text.replace('pagination__item','page-item')
 			print('*********replaced*********')
-			#self.page_source
-			#str_to_file(file_path="response.html", st = r.text)
+			#str_to_file(file_path="response.html", st = self.page_source)
 			#self.driver.get(curl)
 			#self.page_source = self.driver.page_source
 			#return self.page_source
