@@ -53,8 +53,8 @@ class WD:
 				self.page_source = r.text
 				str_to_file('response.html', self.page_source)
 		else:
-			r = requests.get(curl, headers={'User-Agent': UserAgent().chrome})
-			#r = requests.get(curl)
+			#r = requests.get(curl, headers={'User-Agent': UserAgent().chrome})
+			r = requests.get(curl)
 			self.page_source = r.text.replace('pagination__item','page-item')
 			print('*********replaced*********')
 			#str_to_file(file_path="response.html", st = self.page_source)
