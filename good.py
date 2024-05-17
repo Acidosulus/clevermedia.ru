@@ -13,6 +13,7 @@ def poiskpers(url):
 
 class Good:
 	def __init__(self, ol:WD, pc_good_link, pc_price:str):
+		ol = WD()
 		pc_good_link = pc_good_link.replace(r'amp;', '')
 		self.pictures = []
 		self.sizes = []
