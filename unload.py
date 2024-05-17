@@ -34,10 +34,10 @@ if sys.argv[1] == 'good':
     for link in [sys.argv[2]]:
         lo_good = unload_one_good(wd, link, sys.argv[3])
         lc_name = lo_good.name if lo_good.name.count(lo_good.article) != 0 else lo_good.article + ' ' + lo_good.name
-        if 'Под заказ' in lo_good.description or 'Под заказ' in lo_good.page_source:
-            echo(style('Под заказ', fg='bright_red'))
-            continue
-        else: print('Не под заказ')
+        # if 'Под заказ' in lo_good.description or 'Под заказ' in lo_good.page_source:
+        #     echo(style('Под заказ', fg='bright_red'))
+        #     continue
+        # else: print('Не под заказ')
         price.add_good('',
                                 prepare_str(lc_name),
                                 prepare_str(lo_good.description),
@@ -49,6 +49,7 @@ if sys.argv[1] == 'good':
 
 if sys.argv[1] == 'catalog':
     wd = Login()
+    wd.Get_List_of_Catalog_Pages(sys.argv[2])
     links_list = wd.Get_List_Of_Links_On_Goods_From_Catalog(sys.argv[2])
     print('Список товаров:', links_list)
     ln_total = len(links_list)
@@ -57,18 +58,20 @@ if sys.argv[1] == 'catalog':
     for link in links_list:
         lo_good = unload_one_good(wd, link, sys.argv[3])
         lc_name = lo_good.name if lo_good.name.count(lo_good.article) != 0 else lo_good.article + ' ' + lo_good.name
-        if 'Под заказ' in lo_good.description or 'Под заказ' in lo_good.page_source:
-            echo(style('Под заказ', fg='bright_red'))
-            continue
-        else: print('Не под заказ')
-        price.add_good('',
-                                prepare_str(lc_name),
-                                prepare_str(lo_good.description),
-                                prepare_str( str(round(float(lo_good.price)*float(sys.argv[4]), 2))),
-                                '15',
-                                prepare_str(link),
-                                prepare_for_csv_non_list(lo_good.pictures))
-        price.write_to_csv(sys.argv[3])
+        # if 'Под заказ' in lo_good.description or 'Под заказ' in lo_good.page_source:
+        #     echo(style('Под заказ', fg='bright_red'))
+        #     continue
+        # else: print('Не под заказ')
+        # print(type(lo_good.price), len(lo_good.price))
+        if lo_good.price != '':
+            price.add_good('',
+                                    prepare_str(lc_name),
+                                    prepare_str(lo_good.description),
+                                    prepare_str( str(round(float(lo_good.price)*float(sys.argv[4]), 2))),
+                                    '15',
+                                    prepare_str(link),
+                                    prepare_for_csv_non_list(lo_good.pictures))
+            price.write_to_csv(sys.argv[3])
 
 if sys.argv[1] == 'reverse':
     reverse_csv_price(sys.argv[2])
@@ -76,5 +79,5 @@ if sys.argv[1] == 'reverse':
 if sys.argv[1] == 'ansi':
     convert_file_to_ansi(sys.argv[2] + '_reversed.csv')
 
-try: wd.driver.quit()
-except: pass
+    # try: wd.driver.quit()
+    # except: pass

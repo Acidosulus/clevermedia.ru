@@ -26,42 +26,67 @@ class Good:
 		self.brand = ''
 		echo(style('Товар: ', fg='bright_yellow') + style(pc_good_link, fg='bright_white') + style('  Прайс:', fg='bright_cyan') + style(pc_price, fg='bright_green'))
 
-		self.page_source = ol.Get_HTML(pc_good_link)
-		ol.Write_To_File('gsource.html')
-		soup = BS(ol.page_source, features='html5lib')
+		print(f'------------------------------------{pc_good_link}-----------------------------------------')
+		ol.Get_HTML(pc_good_link)
+		if ol.data == None:
+			return
 
+		
 
-		self.article = sx(ol.page_source, '"sku":"','"')
-
-		self.name = soup.find('h1').text.strip()
+		self.article = ol.data['variants'][0]['sku']
+		
 		try:
-			fg = soup.find('div',{'class':'block product-card-description'}).find_all('div', {'class':'form-group'})
+			self.price = ol.data['variants'][0]['price']
+		except:
 			try:
-				for f in fg:
-					self.description = self.description + ' ' +reduce(f.text.replace(chr(10),' ').replace(chr(9),' ').strip())
-			except: pass
-		except:
-			self.description = soup.find('div',{'class':'about__description'}).text
-			self.description = reduce(self.description.replace(chr(10),' ').replace(chr(9),' ').strip())
+				self.price = ol.data['variants'][0]['base_price']
+			except:
+				self.price = ol.data['variants'][0]['old_price']
+
+		self.description = ol.data['short_description']
+		self.name = ol.data['title']
+		append_if_not_exists(ol.data['first_image']['original_url'], self.pictures)
+		for section in ol.data['images']:
+			append_if_not_exists(section['original_url'], self.pictures)
+		# self.page_source = ol.Get_HTML(pc_good_link)
+		# # ol.Write_To_File('gsource.html')
+		# soup = BS(ol.page_source, features='html5lib')
+
+
+		# self.article =  ol.driver.find_element(By.CLASS_NAME, 'product__sku').text.strip()
+
+		# self.name = ol.driver.find_element(By.TAG_NAME,'h1').text.strip()
+		# try:
+		# 	self.description = reduce(soup.find('div',{'class':'product-description'}).text.replace(chr(9),' ').strip())
+		# except:
+		# 	self.description = ''
 		
-		for picture in soup.find_all('img',{'class':'fancybox'}):
-			append_if_not_exists(ol.site_url + picture['href'], self.pictures)
+
+		# pictures = ol.driver.find_elements(By.CLASS_NAME, 'fslightbox-source')
+		# for picture in pictures:
+		# 	append_if_not_exists(picture.get_attribute("src"), self.pictures)
 		
-		if len(self.pictures)==0:
-			for picture in soup.find_all('img',{'alt':'Слайд4'}):
-				append_if_not_exists(ol.site_url + picture['src'], self.pictures)
+		# # if len(self.pictures)==0:
+		# # 	for picture in soup.find_all('img',{'alt':'Слайд4'}):
+		# # 		append_if_not_exists(ol.site_url + picture['src'], self.pictures)
 
 
-		try:
-			self.price = soup.find('div',{'class':'price-new'}).text.replace('рублей','').replace(' ','')
-		except:
-			self.price = soup.find('div',{'class':'item__actual-price'}).text.replace('рублей','').replace(' ','')
-		self.price = self.price.replace('руб.','')
+		# try:
+		# 	self.price = ol.driver.find_element(By.CLASS_NAME,'product__price-cur').text
+		# except:
+		# 	self.price = ol.driver.find_element(By.CLASS_NAME,'product__price-old').text #soup.find('div',{'class':'product__price-old'}).text.replace('рублей','').replace(' ','')
+		# 	try:
+		# 		self.price = ol.driver.find_element(By.CLASS_NAME,'product__price').text #soup.find('div',{'class':'product__price'}).text.replace('рублей','').replace(' ','')
+		# 	except:
+		# 		self.price = ''
+		# self.price = self.price.replace('руб.','')
+		# self.price = self.price.replace('₽','')
+		# self.price = self.price.strip()
 
 
-		try:
-			self.description += ' ' + reduce(soup.find('div',{'class':'tab-pane fade show active'}).text.replace(chr(10),' ').replace(chr(9),' '))
-		except: pass
+		# try:
+		# 	self.description += ' ' + reduce(soup.find('div',{'class':'tab-pane fade show active'}).text.replace(chr(10),' ').replace(chr(9),' '))
+		# except: pass
 
 		return
 		
