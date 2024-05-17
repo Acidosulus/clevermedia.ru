@@ -2,4 +2,4 @@ git add --all
 
 git commit -m "%date% %time%"
 
-git push -u origin main
+git push -u --force origin main
