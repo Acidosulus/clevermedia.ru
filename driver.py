@@ -46,7 +46,7 @@ class WD:
 		# 	self.driver.quit()
 		# except: pass
 
-	def Get_HTML(self, curl):
+	async def Get_HTML(self, curl):
 		if True:
 			print(f"==========================================={curl}===============================================")
 			# source = requests.get(curl).text
@@ -76,27 +76,33 @@ class WD:
 			#return self.page_source
 		return self.page_source
 
-	def Get_List_Of_Links_On_Goods_From_Catalog(self, pc_link:str) -> list:
+	async def Get_List_Of_Links_On_Goods_From_Catalog(self, pc_link:str) -> list:
 		echo(style('Список товаров каталога: ', fg='bright_yellow') + style(pc_link, fg='bright_white'))
 		ll_catalog_items = []
-		ll_catalog_pages_list = self.Get_List_of_Catalog_Pages(pc_link)
+		ll_catalog_pages_list = await self.Get_List_of_Catalog_Pages(pc_link)
 		for catalog_page in ll_catalog_pages_list:
 			echo(style('Список товаров каталога: ', fg='bright_yellow') + style(pc_link, fg='bright_white') + '    ' + style('Страница: ', fg='bright_cyan') +style(catalog_page, fg='bright_green'))
-			self.Get_HTML(catalog_page)
+			await self.Get_HTML(catalog_page)
 			soup = BS(self.page_source, features='html5lib')
 			# elements = soup.find_all('a',{'class':'js-item'})
-			grid = soup.find('div', {'class':'catalog-list'})
-			elements = grid.find_all('a', itemprop='url')
-			for ln_counter, element in enumerate(elements):
-				if self.site_url + element['href'] not in ll_catalog_items:
-					print(f"{ln_counter}  {self.site_url}{element['href']}")
-				append_if_not_exists(self.site_url + element['href'], ll_catalog_items)
+			if soup:
+				grid = soup.find('div', {'class':'catalog-list'})
+				if grid:
+					elements = grid.find_all('a', itemprop='url')
+					for ln_counter, element in enumerate(elements):
+						if self.site_url + element['href'] not in ll_catalog_items:
+							print(f"{ln_counter}  {self.site_url}{element['href']}")
+						append_if_not_exists(self.site_url + element['href'], ll_catalog_items)
+				else:
+					break
+			else:
+				break
 		print(len(ll_catalog_items))
 		return ll_catalog_items
 
 
-	def Get_List_of_Catalog_Pages(self, pc_href:str) -> list:
-		self.Get_HTML(pc_href)
+	async def Get_List_of_Catalog_Pages(self, pc_href:str) -> list:
+		await self.Get_HTML(pc_href)
 		self.pages  = []
 		soup = BS(self.page_source, 'html5lib')
 		# links = self.driver.find_elements(By.CLASS_NAME,'pagination-link')
@@ -119,10 +125,10 @@ class WD:
 
 		
 
-	def Get_link_on_the_next_catalog_page(self, lc_link:str) -> str:
+	async def Get_link_on_the_next_catalog_page(self, lc_link:str) -> str:
 		if lc_link == '':
 			return
-		self.Get_HTML(lc_link)
+		await self.Get_HTML(lc_link)
 		self.Write_To_File('tsource.html')
 		#soup = BS(self.page_source, features='html5lib')
 		soup = BS(self.page_source, features='html5lib')
@@ -137,7 +143,7 @@ class WD:
 				append_if_not_exists(link_on_next, self.list_pages_of_catalog)
 				print(link_on_next.count('http'))
 				if link_on_next.count('http')==1:
-					self.Get_link_on_the_next_catalog_page(link_on_next)
+					await self.Get_link_on_the_next_catalog_page(link_on_next)
 		return
 		"""
 		if page source contented text 'icon-arrow-page-next' it have the next page, in other cases it's the last catalog page

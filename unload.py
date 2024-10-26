@@ -18,6 +18,7 @@ async def limited_task_sem(sem, wd, link, cat, price):
 
 async def unload_one_good(dw:WD, lc_link_on_good: str, pc_price:str, price:Price):
     lo_good = Good(dw, lc_link_on_good, pc_price)
+    await lo_good.get_good(dw, lc_link_on_good, pc_price)
     print(f'{Fore.YELLOW}Название: {Fore.LIGHTGREEN_EX}{lo_good.name}{Fore.RESET}')
     print(f'{Fore.YELLOW}Артикул: {Fore.LIGHTCYAN_EX}{lo_good.article}{Fore.RESET}')
     print(f'{Fore.YELLOW}Цена: {Fore.LIGHTGREEN_EX}{lo_good.price}{Fore.RESET}')
@@ -45,8 +46,8 @@ async def unload_one_good(dw:WD, lc_link_on_good: str, pc_price:str, price:Price
 async def unload_catalog():
     if sys.argv[1] == 'catalog':
         wd = Login()
-        wd.Get_List_of_Catalog_Pages(sys.argv[2])
-        links_list = wd.Get_List_Of_Links_On_Goods_From_Catalog(sys.argv[2])
+        await wd.Get_List_of_Catalog_Pages(sys.argv[2])
+        links_list = await wd.Get_List_Of_Links_On_Goods_From_Catalog(sys.argv[2])
         print('Список товаров:', links_list)
         ln_total = len(links_list)
         ln_counter = 0
