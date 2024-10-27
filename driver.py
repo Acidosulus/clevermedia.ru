@@ -46,7 +46,7 @@ class WD:
 		# 	self.driver.quit()
 		# except: pass
 
-	async def Get_HTML(self, curl):
+	def Get_HTML(self, curl):
 		if True:
 			print(f"==========================================={curl}===============================================")
 			# source = requests.get(curl).text
@@ -76,13 +76,13 @@ class WD:
 			#return self.page_source
 		return self.page_source
 
-	async def Get_List_Of_Links_On_Goods_From_Catalog(self, pc_link:str) -> list:
+	def Get_List_Of_Links_On_Goods_From_Catalog(self, pc_link:str) -> list:
 		echo(style('Список товаров каталога: ', fg='bright_yellow') + style(pc_link, fg='bright_white'))
 		ll_catalog_items = []
-		ll_catalog_pages_list = await self.Get_List_of_Catalog_Pages(pc_link)
+		ll_catalog_pages_list = self.Get_List_of_Catalog_Pages(pc_link)
 		for catalog_page in ll_catalog_pages_list:
 			echo(style('Список товаров каталога: ', fg='bright_yellow') + style(pc_link, fg='bright_white') + '    ' + style('Страница: ', fg='bright_cyan') +style(catalog_page, fg='bright_green'))
-			await self.Get_HTML(catalog_page)
+			self.Get_HTML(catalog_page)
 			soup = BS(self.page_source, features='html5lib')
 			# elements = soup.find_all('a',{'class':'js-item'})
 			if soup:
@@ -94,15 +94,15 @@ class WD:
 							print(f"{ln_counter}  {self.site_url}{element['href']}")
 						append_if_not_exists(self.site_url + element['href'], ll_catalog_items)
 				else:
-					break
+					continue
 			else:
-				break
+				continue
 		print(len(ll_catalog_items))
 		return ll_catalog_items
 
 
-	async def Get_List_of_Catalog_Pages(self, pc_href:str) -> list:
-		await self.Get_HTML(pc_href)
+	def Get_List_of_Catalog_Pages(self, pc_href:str) -> list:
+		self.Get_HTML(pc_href)
 		self.pages  = []
 		soup = BS(self.page_source, 'html5lib')
 		# links = self.driver.find_elements(By.CLASS_NAME,'pagination-link')
@@ -118,33 +118,35 @@ class WD:
 			import re
 			page_number = re.search(r'\d+$', lnk).group()
 			max_number = int(page_number)
+			print(lnk)
+			print(page_number)
 		for i in range(max_number):
-			self.pages.append(f'https://www.clever-media.ru/collection/trendbooks?page={i+1}')
+			self.pages.append(f'https://www.clever-media.ru/collection/all?page={i+1}')
 		rich.print(self.pages)
 		return self.pages
 
 		
 
-	async def Get_link_on_the_next_catalog_page(self, lc_link:str) -> str:
-		if lc_link == '':
-			return
-		await self.Get_HTML(lc_link)
-		self.Write_To_File('tsource.html')
-		#soup = BS(self.page_source, features='html5lib')
-		soup = BS(self.page_source, features='html5lib')
-		link = soup.find('a',{'class':'pagination-next'})
-		if link != None:
-			link_on_next = link['href']
+	# def Get_link_on_the_next_catalog_page(self, lc_link:str) -> str:
+	# 	if lc_link == '':
+	# 		return
+	# 	self.Get_HTML(lc_link)
+	# 	self.Write_To_File('tsource.html')
+	# 	#soup = BS(self.page_source, features='html5lib')
+	# 	soup = BS(self.page_source, features='html5lib')
+	# 	link = soup.find('a',{'class':'pagination-next'})
+	# 	if link != None:
+	# 		link_on_next = link['href']
 
-			print(link_on_next)
+	# 		print(link_on_next)
 
-			if len(link_on_next)>0:
-				link_on_next = self.site_url + link_on_next
-				append_if_not_exists(link_on_next, self.list_pages_of_catalog)
-				print(link_on_next.count('http'))
-				if link_on_next.count('http')==1:
-					await self.Get_link_on_the_next_catalog_page(link_on_next)
-		return
+	# 		if len(link_on_next)>0:
+	# 			link_on_next = self.site_url + link_on_next
+	# 			append_if_not_exists(link_on_next, self.list_pages_of_catalog)
+	# 			print(link_on_next.count('http'))
+	# 			if link_on_next.count('http')==1:
+	# 				self.Get_link_on_the_next_catalog_page(link_on_next)
+	# 	return
 		"""
 		if page source contented text 'icon-arrow-page-next' it have the next page, in other cases it's the last catalog page
 		"""
