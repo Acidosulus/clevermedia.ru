@@ -7,6 +7,8 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup as BS
 from click import echo, style
 from bs4 import BeautifulSoup
+from rich import print
+
 
 def poiskpers(url):
 	geourl = '{0}'.format(quote(url))
@@ -33,9 +35,10 @@ class Good:
 		ol.Get_HTML(pc_good_link)
 		if ol.data == None:
 			return
-
-		from rich import print
-
+		
+		if ol.data['list_card_mode'] != 'buy':
+			print('нет в наличии - пропуск')
+			return
 
 		self.article = ol.data['variants'][0]['sku']
 		if self.article:

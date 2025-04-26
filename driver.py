@@ -19,62 +19,30 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 import uuid
 import rich
+import html
 
 class WD:
 	site_url = 'https://www.clever-media.ru'
 	data = None
 	pages  = []
 		
-	def __init__(self):
-		# self.init()
-		if False:
-			firefox_options = webdriver.FirefoxOptions()
-			firefox_options.add_argument('--disable-gpu')
-			firefox_options.add_argument("--disable-notifications")
-			self.driver = webdriver.Firefox(options=firefox_options)
-			self.driver.maximize_window()
-			# chrome_options = webdriver.ChromeOptions()
-			# chrome_prefs = {}
-			# chrome_options.experimental_options["prefs"] = chrome_prefs
-			# chrome_options.add_argument('--disable-gpu')
-			# chrome_options.add_argument("--disable-notifications")
-			# self.driver = webdriver.Chrome(options=chrome_options)
-			# self.driver.maximize_window()
-
-	# def __del__(self):
-		# try:
-		# 	self.driver.quit()
-		# except: pass
-
 	def Get_HTML(self, curl):
-		if True:
-			print(f"==========================================={curl}===============================================")
-			# source = requests.get(curl).text
-			# self.driver.get(curl)
-			r = requests.get(curl, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'})
-			self.page_source = r.text
-			file = open("rq.html", "w", encoding='utf-8')
-			file.write(r.text)
-			file.close()
-			if 'data-product-json=' in r.text:
-				json_text = sx(r.text, 'data-product-json="','"')
-				import html
-				json_text = html.unescape(json_text)
-				import rich
-				self.data = json.loads(json_text)
-				rich.print(self.data)
-
-			return r.text
-		else:
-			#r = requests.get(curl, headers={'User-Agent': UserAgent().chrome})
-			r = requests.get(curl)
-			self.page_source = r.text.replace('pagination__item','page-item')
-			print('*********replaced*********')
-			#str_to_file(file_path="response.html", st = self.page_source)
-			#self.driver.get(curl)
-			#self.page_source = self.driver.page_source
-			#return self.page_source
-		return self.page_source
+		print(f"==========================================={curl}===============================================")
+		# source = requests.get(curl).text
+		# self.driver.get(curl)
+		r = requests.get(curl, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'})
+		self.page_source = r.text
+		file = open("rq.html", "w", encoding='utf-8')
+		file.write(r.text)
+		file.close()
+		if 'data-product-json=' in r.text:
+			json_text = sx(r.text, 'data-product-json="','"')
+			json_text = html.unescape(json_text)
+			self.data = json.loads(json_text)
+			rich.print(self.data)
+			with open("product_data.json", "w", encoding="utf-8") as f:
+				json.dump(self.data, f, ensure_ascii=False, indent=4)
+		return r.text
 
 	def Get_List_Of_Links_On_Goods_From_Catalog(self, pc_link:str) -> list:
 		echo(style('Список товаров каталога: ', fg='bright_yellow') + style(pc_link, fg='bright_white'))
@@ -84,11 +52,11 @@ class WD:
 			echo(style('Список товаров каталога: ', fg='bright_yellow') + style(pc_link, fg='bright_white') + '    ' + style('Страница: ', fg='bright_cyan') +style(catalog_page, fg='bright_green'))
 			self.Get_HTML(catalog_page)
 			soup = BS(self.page_source, features='html5lib')
-			# elements = soup.find_all('a',{'class':'js-item'})
 			if soup:
 				grid = soup.find('div', {'class':'catalog-list'})
 				if grid:
-					elements = grid.find_all('a', itemprop='url')
+					elements = grid.find_all('a', {'class':'product-preview__photo-variant'})
+					# print('**',elements,'**')
 					for ln_counter, element in enumerate(elements):
 						if self.site_url + element['href'] not in ll_catalog_items:
 							print(f"{ln_counter}  {self.site_url}{element['href']}")
